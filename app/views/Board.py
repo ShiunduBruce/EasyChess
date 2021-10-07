@@ -3,7 +3,7 @@ class Board():
     def __init__(self):
         self.field = [[0, 0, 0, 0],
                       [0, 0, 0, 0],
-                      [0, 0, 0, 0]
+                      [0, 0, 0, 0],
                       [0, 0, 0, 0]]
 """
 Board

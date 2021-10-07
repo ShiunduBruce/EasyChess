@@ -5,6 +5,9 @@ class Board():
                       [0, 0, 0, 0],
                       [0, 0, 0, 0],
                       [0, 0, 0, 0]]
+
+
+
 """
 Board
 1, 2, 3, 4 - for White pieces

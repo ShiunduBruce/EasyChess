@@ -1,4 +1,4 @@
-import Board
+import views.Board as Board
 import tkinter as tk
 
 class BoardGuiTk(tk.Tk):
@@ -40,8 +40,3 @@ class BoardGuiTk(tk.Tk):
                 
 
 
-if __name__ == "__main__":
-    boardGUI = BoardGuiTk ();
-    boardGUI.drawBoard ()
-    boardGUI.mainloop ()
-    

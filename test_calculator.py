@@ -2,8 +2,8 @@
 Unit tests for the calculator library
 """
 #We add all the files in the app directory so that they can be found
-from sys import path
-path.append('..\\EASYCHESS')
+#from sys import path
+#path.append('..\\EASYCHESS')
 
 import calculator
  

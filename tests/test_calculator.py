@@ -5,7 +5,7 @@ Unit tests for the calculator library
 #from sys import path
 #path.append('..\\EASYCHESS')
 
-import calculator
+from app import calculator
  
 #print(calculator.add(2, 2))
 

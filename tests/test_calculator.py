@@ -3,10 +3,11 @@ Unit tests for the calculator library
 """
 #We add all the files in the app directory so that they can be found
 from sys import path
-path.append('..\\app')
+path.append('..\\EASYCHESS')
 
-from views import calculator
+from app.views import calculator
  
+#print(calculator.add(2, 2))
 
 class TestCalculator:
 

@@ -10,15 +10,12 @@ class Board():
 
 """
 Board
-1, 2, 3, 4 - for White pieces
-5, 6, 7, 8 - for Black pieces
+R, B, N, P - for White pieces
+r, b, n, p - for Black pieces
 
-1 - pawn
-2 - rook
-3 - knight
-4 - bishop
-
-
-just to try
+r - rook
+b - bishop
+n - knight
+p - pawn
 
 """

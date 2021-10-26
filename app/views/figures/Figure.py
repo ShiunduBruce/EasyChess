@@ -4,15 +4,12 @@ from PIL import Image, ImageTk
 import os
 
 class Figure():
-    def __init__(self, abbriviation, color):
-        self.abbriviation = abbriviation
 
-        if color == 'white':
-            self.abbriviation = self.abbriviation.upper()
-        elif color == 'black':
-            self.abbriviation = self.abbriviation.lower()
-
+    def __init__(self, piece, color):
+        self.piece = piece
         self.color = color
+        self.abbriviation = color = piece[0] if color == "white" else piece[0].upper ()
+        self.in_board = False
 
     def is_inside_border (self, coords):
         return coords[0] >= 1 and coords[0] <= 4 and coords[1] >= 0 and coords[1] <= 3
@@ -69,7 +66,7 @@ class Figure():
 
 class Knight(Figure):
     def __init__(self, color):
-        Figure.__init__(self, "k", color)
+        Figure.__init__(self, "knight", color)
 
     def check_move_possible(self, position, target, board):
         if self.in_board:

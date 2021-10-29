@@ -1,4 +1,3 @@
-from abc import abstractmethod
 from tkinter.constants import FALSE
 from PIL import Image, ImageTk
 import os

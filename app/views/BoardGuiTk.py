@@ -1,8 +1,13 @@
-import Board as Board
+#UNCOMMENT THIS FOR LOCAL RUN
+#import Board as Board
+#import figures.Figure as Figure
+
+
+#This works for CI, comment this when running locally
+import app.views.Board as Board
+import app.views.figures.Figure as Figure
+
 import tkinter as tk
-import figures.Figure as Figure
-
-
 from PIL import Image, ImageTk
 
 class BoardGuiTk(tk.Tk):
@@ -110,6 +115,8 @@ class BoardGuiTk(tk.Tk):
             self.board.print_board ()
             print ('\n')
             self.refresh()
+            self.board.winner()
+            
 
 
     def getCoords (self, x, y):
@@ -147,6 +154,9 @@ class BoardGuiTk(tk.Tk):
             self.addpiece (self.figures [i], x, y)
             self.addpiece (self.figures [i+half], x, y + self.square_size*5)
             x += self.square_size
+
+
+
 
 
 

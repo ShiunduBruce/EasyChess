@@ -21,7 +21,7 @@ class Database:
     #Difficulty level 1-easy, 2-Medium, 3-Hard
     def createTable(self):
         try:
-            self.cursor.execute('DROP TABLE IF EXISTS EasyChess')
+            #self.cursor.execute('DROP TABLE IF EXISTS EasyChess')
             self.cursor.execute('''CREATE TABLE EasyChess
             (ID INTEGER PRIMARY KEY AUTOINCREMENT,
             Moves        INT,
@@ -34,13 +34,27 @@ class Database:
         except:
             self.logger.warning('FAILED TO CREATE THE TABLE. THE TABLE MAY ALREADY EXIST')
             return False
-    
+
+    def dropTable(self):
+        try:
+            self.cursor.execute('DROP TABLE IF EXISTS EasyChess')
+            self.logger.info('Easychess table droped successfully')
+            return True
+        except:
+            self.logger.warning('FAILED TO DROP THE TABLE')
+            return False
+
     #Insert records into the database
     def insert(self, Moves, won, player_name = 'Player', Complete=True):
         try:
+            if not isinstance(Moves, int):
+                raise Exception('Invalid type')
+
+            if not isinstance(won, bool):
+                raise Exception('Invalid type')
+            
             val = (player_name, won, Moves, Complete)
-            query = "INSERT INTO EasyChess (player_Name, won, Moves,Complete) \
-            VALUES {}".format(val)
+            query = "INSERT INTO EasyChess (player_Name, won, Moves,Complete) VALUES {}".format(val)
             self.cursor.execute(query)
             self.logger.info('One recored inserted successfully')
             return True
@@ -86,6 +100,10 @@ class Database:
     #Selects the most recent games
     def selectRecentGames(self, records):
         try:
+            total = self.selectCountAll()
+            if total < records:
+                raise Exception('More games than present')
+
             query  = 'select * from EasyChess order by created_at desc limit {}'.format(records)
             self.cursor.execute(query)
             self.logger.info('{} most recent game records selected from db'.format(records))
@@ -97,6 +115,10 @@ class Database:
     #Selects the most recent wins
     def selectRecentWins(self, records):
         try:
+            total = self.selectCountAll()
+            if total < records:
+                raise Exception('More games than present')
+            
             query  = 'select * from EasyChess where won <> 0 order by created_at desc limit {}'.format(records)
             self.cursor.execute(query)
             self.logger.info('Recent game wins selected from db with limit {}'.format(records))
@@ -208,7 +230,11 @@ class Database:
     #Select the top wins
     def selectTopWins(self, records):
         try:
-            query  = 'select * from EasyChess where won <> 0 order by moves limit {}'.format(records)
+            total = self.selectCountWins()
+            if total < records:
+                raise Exception('More wins required than present')
+
+            query  = 'select * from EasyChess where won <> 0 order by moves DESC limit {}'.format(records)
             self.cursor.execute(query)
             self.logger.info('Top wins with limit {} selected from db'.format(records))
             return self.cursor.fetchall()
@@ -219,6 +245,10 @@ class Database:
     #Select the top wins
     def selectTopLosses(self, records):
         try:
+            total = self.selectCountLosses()
+            if total < records:
+                raise Exception('More wins required than present')
+
             query  = 'select * from EasyChess where won = 0 order by moves limit {}'.format(records)
             self.cursor.execute(query)
             self.logger.info('Top losses with limit {} selected from db'.format(records))
@@ -226,3 +256,5 @@ class Database:
         except:
             self.logger.warning('UNABLE TO GET TOP LOSSES FROM THE DATABASE WITH LIMIT {}'.format(records))
             return -1
+
+

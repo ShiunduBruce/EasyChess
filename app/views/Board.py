@@ -26,7 +26,7 @@ class Board():
             return 0, self.STARTING.index(letter)
         
         return 5, self.STARTING.index(letter) - 5
-        
+
     #helper function to decide whether who won
     def check_winner(self,array):
         if(all(array)):

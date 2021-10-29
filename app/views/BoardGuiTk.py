@@ -110,6 +110,8 @@ class BoardGuiTk(tk.Tk):
             self.board.print_board ()
             print ('\n')
             self.refresh()
+            self.board.winner()
+            
 
 
     def getCoords (self, x, y):
@@ -147,6 +149,9 @@ class BoardGuiTk(tk.Tk):
             self.addpiece (self.figures [i], x, y)
             self.addpiece (self.figures [i+half], x, y + self.square_size*5)
             x += self.square_size
+
+
+
 
 
 

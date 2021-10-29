@@ -1,8 +1,13 @@
-import Board as Board
+#UNCOMMENT THIS FOR LOCAL RUN
+#import Board as Board
+#import figures.Figure as Figure
+
+
+#This works for CI, comment this when running locally
+import app.views.Board as Board
+import app.views.figures.Figure as Figure
+
 import tkinter as tk
-import figures.Figure as Figure
-
-
 from PIL import Image, ImageTk
 
 class BoardGuiTk(tk.Tk):

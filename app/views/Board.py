@@ -6,6 +6,7 @@ class Board():
         self.reset (figures)
         self.player1 = set(['R','B','K','P'])
         self.player2 = set(['r','b','k','p'])
+
     def print_board (self):
         for i in range (1, len(self.field)-1):
             print ([str (self.field[i][j]) for j in range (len(self.field[i]))], sep=", ")
@@ -25,6 +26,7 @@ class Board():
             return 0, self.STARTING.index(letter)
         
         return 5, self.STARTING.index(letter) - 5
+
     #helper function to decide whether who won
     def check_winner(self,array):
         if(all(array)):

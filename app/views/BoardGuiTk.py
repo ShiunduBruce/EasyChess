@@ -13,10 +13,21 @@ class BoardGuiTk(tk.Tk):
     color2 = "gray"
 
     icons = {}
+    pieces_canvas = {}
 
-    def __init__(self, square_size=64):
+    id_target = None
+    target_location = None
+    clicked_item = None
+
+    def __init__(self, square_size=90):
         super().__init__()
-        self.board = Board.Board()
+        ## figures instances
+
+
+        self.figures = [Figure.Rook("white"), Figure.Bishop("white"), Figure.Knight("white"), Figure.Pawn("white"),
+                        Figure.Rook("blue"), Figure.Bishop("blue"), Figure.Knight("blue"), Figure.Pawn("blue")]
+
+        self.board = Board.Board(self.figures)
 
         self.square_size = square_size
         canvas_width = self.columns * square_size
@@ -28,8 +39,84 @@ class BoardGuiTk(tk.Tk):
 
         self.canvas = tk.Canvas(self, width=canvas_width, height=canvas_height, background="gray")
         self.canvas.pack(fill="both", expand=1)
-        self.fig = Figure.Bishop("white")
 
+        self.statusbar = tk.Frame(self, height=64)
+        self.button_reset = tk.Button(self.statusbar, text="Reset", fg="black", command=self.reset)
+        self.button_reset.pack(side=tk.LEFT, in_=self.statusbar)
+        self.statusbar.pack(expand=False, fill="x", side='bottom')
+
+        ## mouse events
+        self.canvas.bind("<Button-1>", self.click)
+        self.canvas.bind("<B1-Motion>", self.move)
+        self.canvas.bind ("<ButtonRelease-1>", self.release)
+
+
+        
+
+    def reset (self):
+        self.board.reset (self.figures)
+
+        for figure in self.figures:
+            figure.in_board = False
+
+        self.draw_pieces ()
+
+    def refresh (self):
+        #Draws items on the GUI depending on the board.field
+        for i in range (0, self.rows+2):
+            for j in range (self.columns):
+                if self.board.field[i][j] != 0:
+                    coords = self.getCoords (i, j)
+                    id_figure = self.get_id (self.board.field[i][j])
+                    if id_figure > 16:
+                        self.canvas.coords (id_figure, coords[1], coords[0])
+                
+    def get_id (self, figure):
+        return self.pieces_canvas["images/icons/%s%s.png"%(figure.piece, figure.color)]
+
+    def click (self, event):
+        curr_coords = self.getBoardCoords (event.x, event.y)
+
+        self.id_target = self.canvas.find_closest (event.x, event.y)
+        self.target_location = self.canvas.coords (self.id_target)
+        self.clicked_item = self.board.field [curr_coords[0]][curr_coords[1]]
+
+    def move (self, event):
+        if self.id_target[0] > 16:
+            self.canvas.coords (self.id_target[0], event.x - self.square_size/2, event.y - self.square_size/2)
+ 
+
+    def release (self, event):
+        if self.id_target[0] > 16:
+            curr_coords = self.getBoardCoords (event.x, event.y)
+            prev_coords = self.getBoardCoords (self.target_location[0], self.target_location[1])
+
+            if self.board.field[prev_coords[0]][prev_coords[1]].check_move_possible(prev_coords, curr_coords, self.board):
+                
+                #Moving item in board.field, setting previous position to 0
+                if self.board.field[curr_coords[0]][curr_coords[1]] == 0:
+                    self.board.field [prev_coords[0]] [prev_coords[1]] = 0
+                    self.board.field [curr_coords[0]][curr_coords[1]] = self.clicked_item
+
+                elif self.board.field [prev_coords[0]] [prev_coords[1]].color != self.board.field[curr_coords[0]][curr_coords[1]].color:
+                    #Return item to default position
+                    default_coords = self.board.get_default_coords (self.board.field [curr_coords[0]][curr_coords[1]].abbriviation)
+                    self.board.field [curr_coords[0]][curr_coords[1]].in_board = False
+                    self.board.field [default_coords[0]] [default_coords[1]] = self.board.field [curr_coords[0]][curr_coords[1]]
+
+                    self.board.field [prev_coords[0]] [prev_coords[1]] = 0
+                    self.board.field [curr_coords[0]][curr_coords[1]] = self.clicked_item
+ 
+            self.board.print_board ()
+            print ('\n')
+            self.refresh()
+
+
+    def getCoords (self, x, y):
+        return (self.square_size * x + 2, self.square_size * y + 2)
+
+    def getBoardCoords (self, x, y):
+        return (int (y // self.square_size), int (x // self.square_size))
 
     def drawBoard (self):
         color = self.color1
@@ -38,31 +125,29 @@ class BoardGuiTk(tk.Tk):
             for j in range (1, self.columns+1):
                 color = self.color2 if color == self.color1 else self.color1
                 x1 = j * self.square_size - self.square_size ##(self.square_size * (j - 1))
-                y1 = (i * self.square_size - self.square_size) + 64
+                y1 = i * self.square_size
                 x2 = x1 + self.square_size
                 y2 = y1 + self.square_size
                 self.canvas.create_rectangle(x1, y1, x2, y2, outline="black", fill=color)
 
 
+    def addpiece(self, figure, x, y):
+        filename = "images/icons/%s%s.png"%(figure.piece, figure.color)
+        image = Image.open(filename)
+        resize_image = image.resize((self.square_size - 4, self.square_size - 4))
+        self.icons[filename] = ImageTk.PhotoImage(resize_image)
+        self.pieces_canvas[filename] = self.canvas.create_image(x,y, image=self.icons[filename], tags=figure.abbriviation, anchor="nw")
+
     def draw_pieces(self):
-        filename = "images/icons/rookblue.png"
+        x = 2
+        y = 2 
 
-        image = Image.open(filename)
-        resize_image = image.resize((60, 60))
-        self.icons[filename] = ImageTk.PhotoImage(resize_image)
+        half = len (self.figures) // 2
+        for i in range (0, half):
+            self.addpiece (self.figures [i], x, y)
+            self.addpiece (self.figures [i+half], x, y + self.square_size*5)
+            x += self.square_size
 
-        self.canvas.create_image(2, 2, image=self.icons[filename], anchor="nw")
-
-        """ filename = "images/icons/pawnblue.png"
-
-        image = Image.open(filename)
-        resize_image = image.resize((60, 60))
-        self.icons[filename] = ImageTk.PhotoImage(resize_image)
-
-        self.canvas.create_image(66, 2, image=self.icons[filename], anchor="nw") """
-
-        ##TODO Make the full drawing of the pieces in one call
-        ##for i in range (8):
 
 
 

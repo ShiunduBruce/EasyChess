@@ -1,8 +1,9 @@
 import logging
 
 # Handles logging features to make debugging easier
-class Logger:
 
+
+class Logger:
     __slots__ = ('ch', 'fh', 'logger', 'formatter')
 
     def __init__(self, file_handler):
@@ -28,4 +29,3 @@ class Logger:
 
     def warning(self, text):
         self.logger.warning(text)
-

@@ -9,7 +9,7 @@ import app.views.figures.Figure as Figure
 
 import tkinter as tk
 from PIL import Image, ImageTk
-
+from images.ImageHelper import ImageHelper
 
 class BoardGuiTk(tk.Tk):
     rows = 4
@@ -27,6 +27,10 @@ class BoardGuiTk(tk.Tk):
 
     def __init__(self, square_size=90):
         super().__init__()
+        
+        # Image data
+        self.imageHelper = ImageHelper()
+
         # figures instances
 
         self.figures = [Figure.Rook("white"), Figure.Bishop("white"),
@@ -78,7 +82,7 @@ class BoardGuiTk(tk.Tk):
                         self.canvas.coords(id_figure, coords[1], coords[0])
                 
     def get_id(self, figure):
-        return self.pieces_canvas["images/icons/%s%s.png" % (
+        return self.pieces_canvas["%s%s" % (
             figure.piece, figure.color)]
 
     def click(self, event):
@@ -160,13 +164,13 @@ class BoardGuiTk(tk.Tk):
                     x1, y1, x2, y2, outline="black", fill=color)
 
     def addpiece(self, figure, x, y):
-        filename = "images/icons/%s%s.png" % (figure.piece, figure.color)
-        image = Image.open(filename)
+        imageName = "%s%s" % (figure.piece, figure.color)
+        image = Image.open(self.imageHelper.getImageData(imageName))
         resize_image = image.resize(
             (self.square_size - 4, self.square_size - 4))
-        self.icons[filename] = ImageTk.PhotoImage(resize_image)
-        self.pieces_canvas[filename] = self.canvas.create_image(
-            x, y, image=self.icons[filename], 
+        self.icons[imageName] = ImageTk.PhotoImage(resize_image)
+        self.pieces_canvas[imageName] = self.canvas.create_image(
+            x, y, image=self.icons[imageName], 
             tags=figure.abbriviation, anchor="nw")
 
     def draw_pieces(self):

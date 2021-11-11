@@ -11,6 +11,7 @@ import tkinter as tk
 from PIL import Image, ImageTk
 from images.ImageHelper import ImageHelper
 
+
 class BoardGuiTk(tk.Tk):
     rows = 4
     columns = 4

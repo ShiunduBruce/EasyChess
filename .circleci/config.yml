@@ -1,10 +1,10 @@
 # Python CircleCI 2.0 configuration file
 version: 2.1
 orbs:
-  win: circleci/windows@2.2.0
+  github-release: h-matsuo/github-release@0.1.1
 jobs:
   publish-github-release:
-    executor: win/default
+    executor: github-release/default
     steps:
       # Step 1: obtain repo from GitHub
       - checkout

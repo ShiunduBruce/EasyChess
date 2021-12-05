@@ -1,10 +1,10 @@
 # Python CircleCI 2.0 configuration file
 version: 2.1
 orbs:
-  github-release: h-matsuo/github-release@0.1.1
+  win: circleci/windows@2.2.0
 jobs:
   publish-github-release:
-    executor: github-release/default
+    executor: win/default
     steps:
       # Step 1: obtain repo from GitHub
       - checkout
@@ -13,6 +13,7 @@ jobs:
       - run:
           name: install dependencies
           command: |
+            sudo apt-get install patchelf
             sudo apt-get install python3-dev
             sudo apt-get install python3-venv
 
@@ -27,19 +28,26 @@ jobs:
           name: produce executables
           command: |                
             . venv/bin/activate
-            pyinstaller EasyChess.py -F --noconsole
-      
+            python setup.py build
+      - run:
+          name: Produce executables 
+          command: |                
+            . venv/bin/activate
+            tar cvf ./build/EasyChess.tar ./build/
+            cp ./dist/EasyChess.exe ./build/EasyChess.exe
+
       # Step 4: Upload artifacts in dist:
       - store_artifacts:  
-          path: dist
+          path: build
           
       # Step 5: Publish the release
       # The above orbs is used
       - github-release/create:
-          tag: ${VERSION}
+          tag: v${VERSION}
           title: EasyChess v${VERSION}
           description: Stable executables for both windows and linux environment and source code
-          file-path: ./dist
+          file-path: ./build
+
   build:
 
     docker:
@@ -67,7 +75,7 @@ jobs:
             pytest -v --cov
       
 workflows:
-  version: 2
+  version: 2.1
   main:
     jobs:
       - build:

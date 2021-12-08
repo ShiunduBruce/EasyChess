@@ -11,6 +11,7 @@ import tkinter as tk
 from PIL import Image, ImageTk
 from images.ImageHelper import ImageHelper
 
+import math
 
 class BoardGuiTk(tk.Tk):
     rows = 4
@@ -25,6 +26,10 @@ class BoardGuiTk(tk.Tk):
     id_target = None
     target_location = None
     clicked_item = None
+
+    prev_coords = None
+    curr_coords = None
+    board_abbriviations = None
 
     def __init__(self, square_size=90):
         super().__init__()
@@ -45,6 +50,8 @@ class BoardGuiTk(tk.Tk):
         canvas_width = self.columns * square_size
         canvas_height = (self.rows * square_size) + square_size * 2
 
+        self.player1Turn = True
+
         # configure the root window
         self.title('EasyChess App')
         # self.geometry('600x800')
@@ -63,14 +70,15 @@ class BoardGuiTk(tk.Tk):
         self.canvas.bind("<Button-1>", self.click)
         self.canvas.bind("<B1-Motion>", self.move)
         self.canvas.bind("<ButtonRelease-1>", self.release)
-
+        self.best_move = None
     def reset(self):
         self.board.reset(self.figures)
 
         for figure in self.figures:
             figure.in_board = False
 
-        self.draw_pieces()
+        #self.undoMove (self.prev_coords, self.curr_coords, self.board_abbriviations)
+        self.refresh()
 
     def refresh(self):
         # Draws items on the GUI depending on the board.field
@@ -88,15 +96,14 @@ class BoardGuiTk(tk.Tk):
 
     def click(self, event):
         curr_coords = self.getBoardCoords(event.x, event.y)
-
         self.id_target = self.canvas.find_closest(event.x, event.y)
         self.target_location = self.canvas.coords(self.id_target)
         self.clicked_item = self.board.field[curr_coords[0]][curr_coords[1]]
 
     def move(self, event):
         if self.id_target[0] > 16:
-            self.canvas.coords(self.id_target[0], 
-                event.x - self.square_size / 2, 
+            self.canvas.coords(self.id_target[0],
+                event.x - self.square_size / 2,
                     event.y - self.square_size / 2)
  
     def release(self, event):
@@ -115,10 +122,16 @@ class BoardGuiTk(tk.Tk):
 
                 self.board_abbriviations = self.board.get_board_abbriviations ()
                 self.movePiece (prev_coords, curr_coords)
+                self.player1Turn = not self.player1Turn
 
             self.board.print_board()
             print('\n')
             self.board.winner()
+            bot_move = self.max_alpha_beta (-99999999, 99999999, 5)
+            print (bot_move)
+
+            #self.movePiece (bot_move[3], (bot_move[1], bot_move[2]))
+            self.movePiece (self.best_move[0], self.best_move[1])
             self.refresh()
 
     def movePiece (self, prev_coords, curr_coords):
@@ -170,7 +183,7 @@ class BoardGuiTk(tk.Tk):
             self.board.field[a][b] = 0
 
             self.board.field[curr_coords[0]][curr_coords[1]].in_board = True
-            
+
     def getCoords(self, x, y):
         return(self.square_size * x + 2, self.square_size * y + 2)
 
@@ -213,7 +226,61 @@ class BoardGuiTk(tk.Tk):
             x += self.square_size
 
 
+    def max_alpha_beta(self, alpha, beta, depth):
+        result = self.board.winner()
+        if result == 'Player 1 wins':
+            return -10000
+        elif result == 'Bot wins':
+            return 10000
+        elif depth ==  0:
+            return self.board.compute_rating (True)
 
+        possible_moves = self.board.get_possible_moves(True)
 
+        for move in possible_moves:
+            for location_to in move[1]:
+                board_abbriviations_temp = self.board.get_board_abbriviations ()
+                self.movePiece (move[0], location_to)
 
-                
+                rating = self.min_alpha_beta(alpha, beta, depth-1)
+
+                self.undoMove (move[0], location_to, board_abbriviations_temp)
+
+                if rating > alpha:
+                    alpha = rating
+
+                    if depth == 5:
+                        self.best_move = (move[0], location_to)
+
+                if alpha >= beta:
+                    return alpha
+
+        return alpha
+
+    def min_alpha_beta(self, alpha, beta, depth):
+        result = self.board.winner()
+        if result == 'Player 1 wins':
+            return -10000
+        elif result == 'Bot wins':
+            return 10000
+        elif depth ==  0:
+            return self.board.compute_rating (False)
+
+        possible_moves = self.board.get_possible_moves(False)
+
+        for move in possible_moves:
+            for location_to in move[1]:
+                board_abbriviations_temp = self.board.get_board_abbriviations ()
+                self.movePiece (move[0], location_to)
+
+                rating = self.max_alpha_beta(alpha, beta, depth-1)
+
+                self.undoMove (move[0], location_to, board_abbriviations_temp)
+
+                if rating <= beta:
+                    beta = rating
+
+                if alpha >= beta:
+                    return beta
+
+        return beta

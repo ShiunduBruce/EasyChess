@@ -101,47 +101,75 @@ class BoardGuiTk(tk.Tk):
  
     def release(self, event):
         if self.id_target[0] > 16:
+            self.curr_coords = self.getBoardCoords(event.x, event.y)
+            self.prev_coords = self.getBoardCoords(self.target_location[0],
+                            self.target_location[1])
+
             curr_coords = self.getBoardCoords(event.x, event.y)
-            prev_coords = self.getBoardCoords(self.target_location[0], 
+            prev_coords = self.getBoardCoords(self.target_location[0],
                             self.target_location[1])
 
             if self.board.field[
                 prev_coords[0]][prev_coords[1]].check_move_possible(
                     prev_coords, curr_coords, self.board):
-                
-                # Moving item in board.field, setting previous position to 0
-                if self.board.field[curr_coords[0]][curr_coords[1]] == 0:
-                    self.board.field[prev_coords[0]][prev_coords[1]] = 0
-                    cliked = self.clicked_item
-                    self.board.field[curr_coords[0]][curr_coords[1]] = cliked
 
-                elif self.board.field[
-                        prev_coords[0]][
-                            prev_coords[1]].color != self.board.field[
-                            curr_coords[0]][curr_coords[1]].color:
+                self.board_abbriviations = self.board.get_board_abbriviations ()
+                self.movePiece (prev_coords, curr_coords)
 
-                    # Return item to default position
-                    pos = self.board.field[
-                            curr_coords[0]][curr_coords[1]].abbriviation
-                    default_coords = self.board.get_default_coords(pos)
-
-                    self.board.field[
-                        curr_coords[0]][curr_coords[1]].in_board = False
-
-                    a = default_coords[0]
-                    b = default_coords[1]
-                    c = curr_coords[0]
-                    d = curr_coords[1]
-                    self.board.field[a][b] = self.board.field[c][d]
-
-                    self.board.field[prev_coords[0]][prev_coords[1]] = 0
-                    self.board.field[
-                        curr_coords[0]][curr_coords[1]] = self.clicked_item
- 
             self.board.print_board()
             print('\n')
-            self.refresh()
             self.board.winner()
+            self.refresh()
+
+    def movePiece (self, prev_coords, curr_coords):
+        # Moving item in board.field, setting previous position to 0
+        if self.board.field[curr_coords[0]][curr_coords[1]] == 0:
+            self.board.field[curr_coords[0]][curr_coords[1]] = self.board.field[prev_coords[0]][prev_coords[1]]
+            self.board.field[prev_coords[0]][prev_coords[1]] = 0
+
+        else:
+            # Return item to default position
+            pos = self.board.field[
+                    curr_coords[0]][curr_coords[1]].abbriviation
+            default_coords = self.board.get_default_coords(pos)
+
+            self.board.field[
+                curr_coords[0]][curr_coords[1]].in_board = False
+
+            a = default_coords[0]
+            b = default_coords[1]
+            c = curr_coords[0]
+            d = curr_coords[1]
+            self.board.field[a][b] = self.board.field[c][d]
+
+            self.board.field[curr_coords[0]][curr_coords[1]] = self.board.field[prev_coords[0]][prev_coords[1]]
+            self.board.field[prev_coords[0]][prev_coords[1]] = 0
+
+        if not self.board.field [curr_coords[0]][curr_coords[1]].in_board:
+            self.board.field [curr_coords[0]][curr_coords[1]].in_board = True
+
+    def undoMove (self, prev_coords, curr_coords, prev_board):
+        if prev_board[curr_coords[0]][curr_coords[1]] == '0':
+            self.board.field[prev_coords[0]][prev_coords[1]] = self.board.field[curr_coords[0]][curr_coords[1]]
+            self.board.field[curr_coords[0]][curr_coords[1]] = 0
+
+            if prev_coords[0] == 0 or prev_coords[0] == 5:
+                self.board.field[prev_coords[0]][prev_coords[1]].in_board = False
+        else:
+            pos = prev_board[
+                    curr_coords[0]][curr_coords[1]]
+            default_coords = self.board.get_default_coords(pos)
+
+            a = default_coords[0]
+            b = default_coords[1]
+            c = curr_coords[0]
+            d = curr_coords[1]
+
+            self.board.field[prev_coords[0]][prev_coords[1]] = self.board.field[curr_coords[0]][curr_coords[1]]
+            self.board.field[c][d] = self.board.field[a][b]
+            self.board.field[a][b] = 0
+
+            self.board.field[curr_coords[0]][curr_coords[1]].in_board = True
             
     def getCoords(self, x, y):
         return(self.square_size * x + 2, self.square_size * y + 2)

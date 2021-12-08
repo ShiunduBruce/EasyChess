@@ -14,6 +14,16 @@ class Board():
             print([str(self.field[i][j]) for j in range(
                 len(self.field[i]))], sep=", ")
     
+    def get_board_abbriviations (self):
+        abbriviations = []
+        for row_field in self.field:
+            row = []
+            for piece in row_field:
+                row.append (str(piece))
+            abbriviations.append (row)
+
+        return abbriviations
+
     def reset(self, figures):
         self.field = [[figures[0], figures[1], figures[2], figures[3]],
                       [0, 0, 0, 0],

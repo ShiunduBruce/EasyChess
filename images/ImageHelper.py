@@ -30,7 +30,7 @@ class ImageHelper:
             imageData = imagedata.bishopwhite
 
         if imageName == 'knightwhite':
-            imageData = imagedata.rookwhite
+            imageData = imagedata.knightwhite
 
         if imageName == 'pawnwhite':
             imageData = imagedata.pawnwhite

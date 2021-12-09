@@ -26,6 +26,10 @@ class BoardGuiTk(tk.Tk):
     target_location = None
     clicked_item = None
 
+    prev_coords = None
+    curr_coords = None
+    board_abbriviations = None
+
     def __init__(self, square_size=90):
         super().__init__()
         
@@ -45,6 +49,8 @@ class BoardGuiTk(tk.Tk):
         canvas_width = self.columns * square_size
         canvas_height = (self.rows * square_size) + square_size * 2
 
+        self.player1Turn = True
+
         # configure the root window
         self.title('EasyChess App')
         # self.geometry('600x800')
@@ -63,6 +69,7 @@ class BoardGuiTk(tk.Tk):
         self.canvas.bind("<Button-1>", self.click)
         self.canvas.bind("<B1-Motion>", self.move)
         self.canvas.bind("<ButtonRelease-1>", self.release)
+        self.best_move = None
 
     def reset(self):
         self.board.reset(self.figures)
@@ -70,7 +77,7 @@ class BoardGuiTk(tk.Tk):
         for figure in self.figures:
             figure.in_board = False
 
-        self.draw_pieces()
+        self.refresh()
 
     def refresh(self):
         # Draws items on the GUI depending on the board.field
@@ -88,61 +95,93 @@ class BoardGuiTk(tk.Tk):
 
     def click(self, event):
         curr_coords = self.getBoardCoords(event.x, event.y)
-
         self.id_target = self.canvas.find_closest(event.x, event.y)
         self.target_location = self.canvas.coords(self.id_target)
         self.clicked_item = self.board.field[curr_coords[0]][curr_coords[1]]
 
     def move(self, event):
         if self.id_target[0] > 16:
-            self.canvas.coords(self.id_target[0], 
-                event.x - self.square_size / 2, 
+            self.canvas.coords(self.id_target[0],
+                event.x - self.square_size / 2,
                     event.y - self.square_size / 2)
  
     def release(self, event):
         if self.id_target[0] > 16:
+            self.curr_coords = self.getBoardCoords(event.x, event.y)
+            self.prev_coords = self.getBoardCoords(self.target_location[0],
+                            self.target_location[1])
+
             curr_coords = self.getBoardCoords(event.x, event.y)
-            prev_coords = self.getBoardCoords(self.target_location[0], 
+            prev_coords = self.getBoardCoords(self.target_location[0],
                             self.target_location[1])
 
             if self.board.field[
                 prev_coords[0]][prev_coords[1]].check_move_possible(
                     prev_coords, curr_coords, self.board):
-                
-                # Moving item in board.field, setting previous position to 0
-                if self.board.field[curr_coords[0]][curr_coords[1]] == 0:
-                    self.board.field[prev_coords[0]][prev_coords[1]] = 0
-                    cliked = self.clicked_item
-                    self.board.field[curr_coords[0]][curr_coords[1]] = cliked
 
-                elif self.board.field[
-                        prev_coords[0]][
-                            prev_coords[1]].color != self.board.field[
-                            curr_coords[0]][curr_coords[1]].color:
+                self.board_abbriviations = self.board.get_board_abbriviations()
+                self.movePiece(prev_coords, curr_coords)
+                self.player1Turn = not self.player1Turn
 
-                    # Return item to default position
-                    pos = self.board.field[
-                            curr_coords[0]][curr_coords[1]].abbriviation
-                    default_coords = self.board.get_default_coords(pos)
-
-                    self.board.field[
-                        curr_coords[0]][curr_coords[1]].in_board = False
-
-                    a = default_coords[0]
-                    b = default_coords[1]
-                    c = curr_coords[0]
-                    d = curr_coords[1]
-                    self.board.field[a][b] = self.board.field[c][d]
-
-                    self.board.field[prev_coords[0]][prev_coords[1]] = 0
-                    self.board.field[
-                        curr_coords[0]][curr_coords[1]] = self.clicked_item
- 
             self.board.print_board()
             print('\n')
-            self.refresh()
             self.board.winner()
-            
+            bot_move = self.max_alpha_beta(-99999999, 99999999, 5)
+            print(bot_move)
+
+            self.movePiece(self.best_move[0], self.best_move[1])
+            self.refresh()
+
+    def movePiece(self, prev_coords, curr_coords):
+        # Moving item in board.field, setting previous position to 0
+        if self.board.field[curr_coords[0]][curr_coords[1]] == 0:
+            self.board.field[curr_coords[0]][curr_coords[1]] = self.board.field[prev_coords[0]][prev_coords[1]]
+            self.board.field[prev_coords[0]][prev_coords[1]] = 0
+
+        else:
+            # Return item to default position
+            pos = self.board.field[
+                    curr_coords[0]][curr_coords[1]].abbriviation
+            default_coords = self.board.get_default_coords(pos)
+
+            self.board.field[
+                curr_coords[0]][curr_coords[1]].in_board = False
+
+            a = default_coords[0]
+            b = default_coords[1]
+            c = curr_coords[0]
+            d = curr_coords[1]
+            self.board.field[a][b] = self.board.field[c][d]
+
+            self.board.field[curr_coords[0]][curr_coords[1]] = self.board.field[prev_coords[0]][prev_coords[1]]
+            self.board.field[prev_coords[0]][prev_coords[1]] = 0
+
+        if not self.board.field[curr_coords[0]][curr_coords[1]].in_board:
+            self.board.field[curr_coords[0]][curr_coords[1]].in_board = True
+
+    def undoMove(self, prev_coords, curr_coords, prev_board):
+        if prev_board[curr_coords[0]][curr_coords[1]] == '0':
+            self.board.field[prev_coords[0]][prev_coords[1]] = self.board.field[curr_coords[0]][curr_coords[1]]
+            self.board.field[curr_coords[0]][curr_coords[1]] = 0
+
+            if prev_coords[0] == 0 or prev_coords[0] == 5:
+                self.board.field[prev_coords[0]][prev_coords[1]].in_board = False
+        else:
+            pos = prev_board[
+                    curr_coords[0]][curr_coords[1]]
+            default_coords = self.board.get_default_coords(pos)
+
+            a = default_coords[0]
+            b = default_coords[1]
+            c = curr_coords[0]
+            d = curr_coords[1]
+
+            self.board.field[prev_coords[0]][prev_coords[1]] = self.board.field[curr_coords[0]][curr_coords[1]]
+            self.board.field[c][d] = self.board.field[a][b]
+            self.board.field[a][b] = 0
+
+            self.board.field[curr_coords[0]][curr_coords[1]].in_board = True
+
     def getCoords(self, x, y):
         return(self.square_size * x + 2, self.square_size * y + 2)
 
@@ -184,8 +223,61 @@ class BoardGuiTk(tk.Tk):
             self.addpiece(self.figures[i + half], x, y + self.square_size * 5)
             x += self.square_size
 
+    def max_alpha_beta(self, alpha, beta, depth):
+        result = self.board.winner()
+        if result == 'Player 1 wins':
+            return -10000
+        elif result == 'Bot wins':
+            return 10000
+        elif depth == 0:
+            return self.board.compute_rating(True)
 
+        possible_moves = self.board.get_possible_moves(True)
 
+        for move in possible_moves:
+            for location_to in move[1]:
+                board_abbriviations_temp = self.board.get_board_abbriviations()
+                self.movePiece(move[0], location_to)
 
+                rating = self.min_alpha_beta(alpha, beta, depth - 1)
 
-                
+                self.undoMove(move[0], location_to, board_abbriviations_temp)
+
+                if rating > alpha:
+                    alpha = rating
+
+                    if depth == 5:
+                        self.best_move = (move[0], location_to)
+
+                if alpha >= beta:
+                    return alpha
+
+        return alpha
+
+    def min_alpha_beta(self, alpha, beta, depth):
+        result = self.board.winner()
+        if result == 'Player 1 wins':
+            return -10000
+        elif result == 'Bot wins':
+            return 10000
+        elif depth == 0:
+            return self.board.compute_rating(False)
+
+        possible_moves = self.board.get_possible_moves(False)
+
+        for move in possible_moves:
+            for location_to in move[1]:
+                board_abbriviations_temp = self.board.get_board_abbriviations()
+                self.movePiece(move[0], location_to)
+
+                rating = self.max_alpha_beta(alpha, beta, depth - 1)
+
+                self.undoMove(move[0], location_to, board_abbriviations_temp)
+
+                if rating <= beta:
+                    beta = rating
+
+                if alpha >= beta:
+                    return beta
+
+        return beta

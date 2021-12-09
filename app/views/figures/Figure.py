@@ -61,7 +61,9 @@ class Figure():
         if not self.is_inside_border(target):
             return False
 
-        self.in_board = True
+        if self.get(target, board) != 0:
+            return False
+
         return True
 
 
@@ -92,7 +94,9 @@ class Knight(Figure):
         if not self.is_inside_border(target):
             return False
 
-        self.in_board = True
+        if self.get(target, board) != 0:
+            return False
+
         return True
 
 
@@ -140,7 +144,9 @@ class Pawn(Figure):
         if not self.is_inside_border(target):
             return False
 
-        self.in_board = True
+        if self.get(target, board) != 0:
+            return False
+
         self.check_reverse(target[0])
         return True
 

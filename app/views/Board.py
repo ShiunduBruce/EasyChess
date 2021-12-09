@@ -107,7 +107,6 @@ class Board():
         if not self.field[curr_coords[0]][curr_coords[1]].in_board:
             self.field[curr_coords[0]][curr_coords[1]].in_board = True
 
-
     def undoMove(self, prev_coords, curr_coords, prev_board):
         if prev_board[curr_coords[0]][curr_coords[1]] == '0':
             self.field[prev_coords[0]][prev_coords[1]] = self.field[curr_coords[0]][curr_coords[1]]

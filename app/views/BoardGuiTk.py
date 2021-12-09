@@ -32,7 +32,6 @@ class BoardGuiTk(tk.Tk):
     curr_coords = None
     board_abbriviations = None
     
-
     def __init__(self, square_size=90):
         super().__init__()
 
@@ -80,15 +79,17 @@ class BoardGuiTk(tk.Tk):
             figure.in_board = False
 
         self.refresh()
+
     def popupmsg(msg, title):
         root = tk.Tk()
         root.title(title)
-        label = tk.Label(root, text=msg)
-        label.pack(side="top", fill="x", pady=10)
+        label = tk.Label(root, text = msg)
+        label.pack(side = "top", fill = "x", pady=10)
 
-        B1 = tk.Button(root, text="Okay", command = root.destroy)
+        B1 = tk.Button(root, text = "Okay", command = root.destroy)
         B1.pack()
         root.mainloop()
+
     def refresh(self):
         # Draws items on the GUI depending on the board.field
         for i in range(0, self.rows + 2):
@@ -135,7 +136,7 @@ class BoardGuiTk(tk.Tk):
 
             self.refresh()
             self.canvas.after(1, self.bot.move_bot)
-            #self.popupmsg(self.board.winner())
+            # self.popupmsg(self.board.winner())
     
     def getCoords(self, x, y):
         return(self.square_size * x + 2, self.square_size * y + 2)

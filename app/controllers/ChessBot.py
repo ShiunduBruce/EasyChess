@@ -2,10 +2,9 @@
 
 class ChessBot:
 
-    def __init__(self,boardGUITK):
+    def __init__(self, boardGUITK):
         self.boardGUI = boardGUITK
 
-    
     def max_alpha_beta(self, alpha, beta, depth):
         result = self.boardGUI.board.winner()
         if result == 'Player 1 wins':

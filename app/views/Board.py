@@ -29,7 +29,7 @@ class Board():
         for i in range(0, 6):
             for j in range(0, 4):
                 if self.field[i][j] != 0:
-                    if(bot_move and self.field[i][j].abbriviation.isupper()) or(not bot_move and self.field[i][j].abbriviation.islower()):
+                    if(bot_move and self.field[i][j].abbriviation.isupper()) or (not bot_move and self.field[i][j].abbriviation.islower()):
                         pieces.append((i, j))
 
         return pieces

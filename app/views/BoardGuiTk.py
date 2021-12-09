@@ -11,7 +11,6 @@ import tkinter as tk
 from PIL import Image, ImageTk
 from images.ImageHelper import ImageHelper
 
-import math
 
 class BoardGuiTk(tk.Tk):
     rows = 4
@@ -71,13 +70,13 @@ class BoardGuiTk(tk.Tk):
         self.canvas.bind("<B1-Motion>", self.move)
         self.canvas.bind("<ButtonRelease-1>", self.release)
         self.best_move = None
+
     def reset(self):
         self.board.reset(self.figures)
 
         for figure in self.figures:
             figure.in_board = False
 
-        #self.undoMove (self.prev_coords, self.curr_coords, self.board_abbriviations)
         self.refresh()
 
     def refresh(self):
@@ -130,7 +129,6 @@ class BoardGuiTk(tk.Tk):
             bot_move = self.max_alpha_beta(-99999999, 99999999, 5)
             print(bot_move)
 
-            #self.movePiece (bot_move[3], (bot_move[1], bot_move[2]))
             self.movePiece(self.best_move[0], self.best_move[1])
             self.refresh()
 
@@ -225,14 +223,13 @@ class BoardGuiTk(tk.Tk):
             self.addpiece(self.figures[i + half], x, y + self.square_size * 5)
             x += self.square_size
 
-
     def max_alpha_beta(self, alpha, beta, depth):
         result = self.board.winner()
         if result == 'Player 1 wins':
             return -10000
         elif result == 'Bot wins':
             return 10000
-        elif depth ==  0:
+        elif depth == 0:
             return self.board.compute_rating(True)
 
         possible_moves = self.board.get_possible_moves(True)
@@ -242,7 +239,7 @@ class BoardGuiTk(tk.Tk):
                 board_abbriviations_temp = self.board.get_board_abbriviations()
                 self.movePiece(move[0], location_to)
 
-                rating = self.min_alpha_beta(alpha, beta, depth-1)
+                rating = self.min_alpha_beta(alpha, beta, depth - 1)
 
                 self.undoMove(move[0], location_to, board_abbriviations_temp)
 
@@ -263,7 +260,7 @@ class BoardGuiTk(tk.Tk):
             return -10000
         elif result == 'Bot wins':
             return 10000
-        elif depth ==  0:
+        elif depth == 0:
             return self.board.compute_rating(False)
 
         possible_moves = self.board.get_possible_moves(False)
@@ -273,7 +270,7 @@ class BoardGuiTk(tk.Tk):
                 board_abbriviations_temp = self.board.get_board_abbriviations()
                 self.movePiece(move[0], location_to)
 
-                rating = self.max_alpha_beta(alpha, beta, depth-1)
+                rating = self.max_alpha_beta(alpha, beta, depth - 1)
 
                 self.undoMove(move[0], location_to, board_abbriviations_temp)
 

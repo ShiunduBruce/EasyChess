@@ -1,5 +1,4 @@
-import app.views.BoardGuiTk as BoardG
-import app.views.figures.Figure as Figure
+
 
 class ChessBot:
 
@@ -66,7 +65,7 @@ class ChessBot:
 
         return beta
 
-    def move_bot (self):
-        bot_move = self.max_alpha_beta(-99999999, 99999999, 5)
+    def move_bot(self):
+        self.max_alpha_beta(-99999999, 99999999, 5)
         self.boardGUI.board.movePiece(self.boardGUI.best_move[0], self.boardGUI.best_move[1])
         self.boardGUI.refresh()

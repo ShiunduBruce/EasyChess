@@ -8,7 +8,6 @@ import app.views.Board as Board
 import app.views.figures.Figure as Figure
 import app.controllers.ChessBot as Bot
 
-import time 
 
 import tkinter as tk
 from PIL import Image, ImageTk
@@ -36,7 +35,7 @@ class BoardGuiTk(tk.Tk):
 
     def __init__(self, square_size=90):
         super().__init__()
-        
+
         # Image data
         self.imageHelper = ImageHelper()
 
@@ -54,10 +53,6 @@ class BoardGuiTk(tk.Tk):
         canvas_height = (self.rows * square_size) + square_size * 2
 
         self.player1Turn = True
-        self.turn = 0 
-        self.prevC = None
-        self.currC= None
-        self.bot_move=None
         # configure the root window
         self.title('EasyChess App')
         # self.geometry('600x800')
@@ -90,6 +85,7 @@ class BoardGuiTk(tk.Tk):
         root.title(title)
         label = tk.Label(root, text=msg)
         label.pack(side="top", fill="x", pady=10)
+
         B1 = tk.Button(root, text="Okay", command = root.destroy)
         B1.pack()
         root.mainloop()
@@ -138,9 +134,8 @@ class BoardGuiTk(tk.Tk):
                 self.player1Turn = not self.player1Turn
 
             self.refresh()
-            self.canvas.after(1,self.bot.move_bot)
+            self.canvas.after(1, self.bot.move_bot)
             #self.popupmsg(self.board.winner())
-    
     
     def getCoords(self, x, y):
         return(self.square_size * x + 2, self.square_size * y + 2)

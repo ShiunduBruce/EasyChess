@@ -1,5 +1,3 @@
-import tkinter as tk
-
 
 class Board():
     def __init__(self, figures):
@@ -138,7 +136,6 @@ class Board():
         for i in range(1, len(self.field) - 1):
             row = [(str(x) if x != 0 else x) for x in self.field[i]]
             if(self.check_winner(row)):
-                #self.popupmsg(self.check_winner(row),'WINNER')
                 return self.check_winner(row)
         
         # Checking the first diagonal
@@ -148,7 +145,6 @@ class Board():
 
         if(self.check_winner(diag1)):
             print(self.check_winner(diag1))
-            #self.popupmsg(self.check_winner(row),'WINNER')
             return self.check_winner(diag1)
         
         # Checking the second diagonal
@@ -156,7 +152,6 @@ class Board():
                     if self.field[x][len(self.field[x]) - x] != 0 else 0) 
                         for x in range(1, len(self.field) - 1)]
         if(self.check_winner(diag2)):
-            #self.popupmsg(self.check_winner(row),'WINNER')
             return self.check_winner(diag2)
 
         # checking the columns
@@ -167,7 +162,6 @@ class Board():
             col.append(str(self.field[3][i]) if self.field[3][i] != 0 else 0)
             col.append(str(self.field[4][i]) if self.field[4][i] != 0 else 0)
             if(self.check_winner(col)):
-                #self.popupmsg(self.check_winner(row),'WINNER')
                 return self.check_winner(col)
 
     def get_possible_moves(self, bot_move):

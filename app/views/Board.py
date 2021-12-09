@@ -1,4 +1,4 @@
-# import tkinter
+import tkinter as tk
 
 
 class Board():
@@ -81,12 +81,64 @@ class Board():
                 return "Player 1 wins"
             if set(array) == set(self.player2):
                 return "Bot wins"
+    
+    def movePiece(self, prev_coords, curr_coords):
+        # Moving item in board.field, setting previous position to 0
+        if self.field[curr_coords[0]][curr_coords[1]] == 0:
+            self.field[curr_coords[0]][curr_coords[1]] = self.field[prev_coords[0]][prev_coords[1]]
+            self.field[prev_coords[0]][prev_coords[1]] = 0
 
+        else:
+            # Return item to default position
+            pos = self.field[
+                    curr_coords[0]][curr_coords[1]].abbriviation
+            default_coords = self.get_default_coords(pos)
+
+            self.field[
+                curr_coords[0]][curr_coords[1]].in_board = False
+
+            a = default_coords[0]
+            b = default_coords[1]
+            c = curr_coords[0]
+            d = curr_coords[1]
+            self.field[a][b] = self.field[c][d]
+
+            self.field[curr_coords[0]][curr_coords[1]] = self.field[prev_coords[0]][prev_coords[1]]
+            self.field[prev_coords[0]][prev_coords[1]] = 0
+
+        if not self.field[curr_coords[0]][curr_coords[1]].in_board:
+            self.field[curr_coords[0]][curr_coords[1]].in_board = True
+
+
+    def undoMove(self, prev_coords, curr_coords, prev_board):
+        if prev_board[curr_coords[0]][curr_coords[1]] == '0':
+            self.field[prev_coords[0]][prev_coords[1]] = self.field[curr_coords[0]][curr_coords[1]]
+            self.field[curr_coords[0]][curr_coords[1]] = 0
+
+            if prev_coords[0] == 0 or prev_coords[0] == 5:
+                self.field[prev_coords[0]][prev_coords[1]].in_board = False
+        else:
+            pos = prev_board[
+                    curr_coords[0]][curr_coords[1]]
+            default_coords = self.get_default_coords(pos)
+
+            a = default_coords[0]
+            b = default_coords[1]
+            c = curr_coords[0]
+            d = curr_coords[1]
+
+            self.field[prev_coords[0]][prev_coords[1]] = self.field[curr_coords[0]][curr_coords[1]]
+            self.field[c][d] = self.field[a][b]
+            self.field[a][b] = 0
+
+            self.field[curr_coords[0]][curr_coords[1]].in_board = True
+   
     def winner(self):
         # checking the rows
         for i in range(1, len(self.field) - 1):
             row = [(str(x) if x != 0 else x) for x in self.field[i]]
             if(self.check_winner(row)):
+                #self.popupmsg(self.check_winner(row),'WINNER')
                 return self.check_winner(row)
         
         # Checking the first diagonal
@@ -96,6 +148,7 @@ class Board():
 
         if(self.check_winner(diag1)):
             print(self.check_winner(diag1))
+            #self.popupmsg(self.check_winner(row),'WINNER')
             return self.check_winner(diag1)
         
         # Checking the second diagonal
@@ -103,6 +156,7 @@ class Board():
                     if self.field[x][len(self.field[x]) - x] != 0 else 0) 
                         for x in range(1, len(self.field) - 1)]
         if(self.check_winner(diag2)):
+            #self.popupmsg(self.check_winner(row),'WINNER')
             return self.check_winner(diag2)
 
         # checking the columns
@@ -113,6 +167,7 @@ class Board():
             col.append(str(self.field[3][i]) if self.field[3][i] != 0 else 0)
             col.append(str(self.field[4][i]) if self.field[4][i] != 0 else 0)
             if(self.check_winner(col)):
+                #self.popupmsg(self.check_winner(row),'WINNER')
                 return self.check_winner(col)
 
     def get_possible_moves(self, bot_move):

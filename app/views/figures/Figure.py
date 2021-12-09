@@ -44,6 +44,7 @@ class Figure():
                     # Checking if we reached the target
                     if curr_pos == target:
                         a = self.get(target, board) == 0
+                        print(position)
                         b = self.get(position, board).color
                         if a or b != self.get(target, board).color:
                             return True

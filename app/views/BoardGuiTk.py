@@ -120,21 +120,21 @@ class BoardGuiTk(tk.Tk):
                 prev_coords[0]][prev_coords[1]].check_move_possible(
                     prev_coords, curr_coords, self.board):
 
-                self.board_abbriviations = self.board.get_board_abbriviations ()
-                self.movePiece (prev_coords, curr_coords)
+                self.board_abbriviations = self.board.get_board_abbriviations()
+                self.movePiece(prev_coords, curr_coords)
                 self.player1Turn = not self.player1Turn
 
             self.board.print_board()
             print('\n')
             self.board.winner()
-            bot_move = self.max_alpha_beta (-99999999, 99999999, 5)
-            print (bot_move)
+            bot_move = self.max_alpha_beta(-99999999, 99999999, 5)
+            print(bot_move)
 
             #self.movePiece (bot_move[3], (bot_move[1], bot_move[2]))
-            self.movePiece (self.best_move[0], self.best_move[1])
+            self.movePiece(self.best_move[0], self.best_move[1])
             self.refresh()
 
-    def movePiece (self, prev_coords, curr_coords):
+    def movePiece(self, prev_coords, curr_coords):
         # Moving item in board.field, setting previous position to 0
         if self.board.field[curr_coords[0]][curr_coords[1]] == 0:
             self.board.field[curr_coords[0]][curr_coords[1]] = self.board.field[prev_coords[0]][prev_coords[1]]
@@ -158,10 +158,10 @@ class BoardGuiTk(tk.Tk):
             self.board.field[curr_coords[0]][curr_coords[1]] = self.board.field[prev_coords[0]][prev_coords[1]]
             self.board.field[prev_coords[0]][prev_coords[1]] = 0
 
-        if not self.board.field [curr_coords[0]][curr_coords[1]].in_board:
-            self.board.field [curr_coords[0]][curr_coords[1]].in_board = True
+        if not self.board.field[curr_coords[0]][curr_coords[1]].in_board:
+            self.board.field[curr_coords[0]][curr_coords[1]].in_board = True
 
-    def undoMove (self, prev_coords, curr_coords, prev_board):
+    def undoMove(self, prev_coords, curr_coords, prev_board):
         if prev_board[curr_coords[0]][curr_coords[1]] == '0':
             self.board.field[prev_coords[0]][prev_coords[1]] = self.board.field[curr_coords[0]][curr_coords[1]]
             self.board.field[curr_coords[0]][curr_coords[1]] = 0
@@ -233,18 +233,18 @@ class BoardGuiTk(tk.Tk):
         elif result == 'Bot wins':
             return 10000
         elif depth ==  0:
-            return self.board.compute_rating (True)
+            return self.board.compute_rating(True)
 
         possible_moves = self.board.get_possible_moves(True)
 
         for move in possible_moves:
             for location_to in move[1]:
-                board_abbriviations_temp = self.board.get_board_abbriviations ()
-                self.movePiece (move[0], location_to)
+                board_abbriviations_temp = self.board.get_board_abbriviations()
+                self.movePiece(move[0], location_to)
 
                 rating = self.min_alpha_beta(alpha, beta, depth-1)
 
-                self.undoMove (move[0], location_to, board_abbriviations_temp)
+                self.undoMove(move[0], location_to, board_abbriviations_temp)
 
                 if rating > alpha:
                     alpha = rating
@@ -264,18 +264,18 @@ class BoardGuiTk(tk.Tk):
         elif result == 'Bot wins':
             return 10000
         elif depth ==  0:
-            return self.board.compute_rating (False)
+            return self.board.compute_rating(False)
 
         possible_moves = self.board.get_possible_moves(False)
 
         for move in possible_moves:
             for location_to in move[1]:
-                board_abbriviations_temp = self.board.get_board_abbriviations ()
-                self.movePiece (move[0], location_to)
+                board_abbriviations_temp = self.board.get_board_abbriviations()
+                self.movePiece(move[0], location_to)
 
                 rating = self.max_alpha_beta(alpha, beta, depth-1)
 
-                self.undoMove (move[0], location_to, board_abbriviations_temp)
+                self.undoMove(move[0], location_to, board_abbriviations_temp)
 
                 if rating <= beta:
                     beta = rating

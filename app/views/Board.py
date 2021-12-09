@@ -14,23 +14,23 @@ class Board():
             print([str(self.field[i][j]) for j in range(
                 len(self.field[i]))], sep=", ")
 
-    def get_board_abbriviations (self):
+    def get_board_abbriviations(self):
         abbriviations = []
         for row_field in self.field:
             row = []
             for piece in row_field:
-                row.append (str(piece))
-            abbriviations.append (row)
+                row.append(str(piece))
+            abbriviations.append(row)
 
         return abbriviations
 
-    def get_player_pieces (self, bot_move):
+    def get_player_pieces(self, bot_move):
         pieces = []
         for i in range(0, 6):
-            for j in range (0, 4):
-                if self.field [i][j] != 0:
-                    if (bot_move and self.field [i][j].abbriviation.isupper ()) or (not bot_move and self.field [i][j].abbriviation.islower ()):
-                        pieces.append ((i,j))
+            for j in range(0, 4):
+                if self.field[i][j] != 0:
+                    if(bot_move and self.field[i][j].abbriviation.isupper ()) or (not bot_move and self.field[i][j].abbriviation.islower()):
+                        pieces.append((i, j))
 
         return pieces
 
@@ -48,7 +48,7 @@ class Board():
         
         return 5, self.STARTING.index(letter) - 5
 
-    def compute_rating (self, bot_move):
+    def compute_rating(self, bot_move):
         result = self.winner()
         if result == "Player 1 wins" and not bot_move:
             return 10000
@@ -58,14 +58,11 @@ class Board():
             return -10000
         if result == "Bot wins" and not bot_move:
             return -10000
-
-        player_pieces = self.get_player_pieces (False)
-        bot_pieces = self.get_player_pieces (True)
-
+ 
         player_score = 0
         bot_score = 0
 
-        for i in range (0, 4):
+        for i in range(0, 4):
             if self.field[0][i] != 0:
                 player_score += 1
 
@@ -118,18 +115,18 @@ class Board():
             if(self.check_winner(col)):
                 return self.check_winner(col)
 
-    def get_possible_moves (self, bot_move):
-        pieces = self.get_player_pieces (bot_move)
+    def get_possible_moves(self, bot_move):
+        pieces = self.get_player_pieces(bot_move)
         possible_moves = []
         for piece in pieces:
             moves = []
             for i in range(1, len(self.field) - 1):
-                for j in range (0, 4):
-                    if self.field [piece[0]][piece[1]].check_move_possible (piece, (i,j), self):
-                        moves.append ((i,j))
+                for j in range(0, 4):
+                    if self.field[piece[0]][piece[1]].check_move_possible(piece, (i, j), self):
+                        moves.append((i, j))
 
             if len(moves) != 0:
-                possible_moves.append ((piece, moves))
+                possible_moves.append((piece, moves))
         return possible_moves
 """
 Board

@@ -112,8 +112,12 @@ class BoardGuiTk(tk.Tk):
 
     def move(self, event):
         if self.id_target[0] > 16:
-            self.canvas.coords(self.id_target[0],
-                event.x - self.square_size / 2,
+            prev_coords = self.getBoardCoords(self.target_location[0],
+                            self.target_location[1])
+
+            if self.board.field[prev_coords[0]][prev_coords[1]].abbriviation.islower():
+                self.canvas.coords(self.id_target[0],
+                    event.x - self.square_size / 2,
                     event.y - self.square_size / 2)
  
     def release(self, event):
@@ -127,6 +131,7 @@ class BoardGuiTk(tk.Tk):
                             self.target_location[1])
 
             if self.board.field[
+                prev_coords[0]][prev_coords[1]].abbriviation.islower() and self.board.field[
                 prev_coords[0]][prev_coords[1]].check_move_possible(
                     prev_coords, curr_coords, self.board):
 
@@ -134,8 +139,10 @@ class BoardGuiTk(tk.Tk):
                 self.board.movePiece(prev_coords, curr_coords)
                 self.player1Turn = not self.player1Turn
 
-            self.refresh()
-            self.canvas.after(1, self.bot.move_bot)
+                self.refresh()
+                self.canvas.after(1, self.bot.move_bot)
+            else:
+                self.refresh()
             # self.popupmsg(self.board.winner())
     
     def getCoords(self, x, y):

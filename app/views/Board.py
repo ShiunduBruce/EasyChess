@@ -143,7 +143,6 @@ class Board():
                         for x in range(1, len(self.field) - 1)]
 
         if(self.check_winner(diag1)):
-            print(self.check_winner(diag1))
             return self.check_winner(diag1)
         
         # Checking the second diagonal

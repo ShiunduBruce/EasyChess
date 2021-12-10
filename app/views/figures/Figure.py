@@ -44,7 +44,6 @@ class Figure():
                     # Checking if we reached the target
                     if curr_pos == target:
                         a = self.get(target, board) == 0
-                        print(position)
                         b = self.get(position, board).color
                         if a or b != self.get(target, board).color:
                             return True
@@ -149,6 +148,7 @@ class Pawn(Figure):
             return False
 
         self.check_reverse(target[0])
+
         return True
 
 

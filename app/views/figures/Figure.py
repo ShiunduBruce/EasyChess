@@ -148,6 +148,7 @@ class Pawn(Figure):
             return False
 
         self.check_reverse(target[0])
+
         return True
 
 
